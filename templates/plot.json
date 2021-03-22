@@ -1,0 +1,65 @@
+{
+    "title": "a_title",
+    "rows": [
+        {
+            "subplots": [
+                {
+                    "x_label": "sprints",
+                    "y_label": "points",
+                    "plots": [
+                        {
+                            "item": "validated_points",
+                            "label": "confirmed points",
+                            "options": {
+                                "marker": "o"
+                            }
+                        },
+                        {
+                            "item": "committed_points",
+                            "label": "committed points"
+                        }
+                    ]
+                },
+                {
+                    "x_label": "sprints",
+                    "y_label": "stories",
+                    "plots": [
+                        {
+                            "item": "validated_stories",
+                            "label": "confirmed stories"
+                        },
+                        {
+                            "item": "committed_stories",
+                            "label": "committed stories"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "subplots": [
+                {
+                    "x_label": "sprints",
+                    "y_label": "points",
+                    "plots": [
+                        {
+                            "item": "load.points_person",
+                            "label": "points per person"
+                        }
+                    ]
+                },
+                {
+                    "x_label": "sprints",
+                    "y_label": "points",
+                    "plots": [
+                        {
+                            "item": "load.points_person_day",
+                            "label": "points per person/day"
+                        }
+                    ]
+                }
+
+            ]
+        }
+    ]
+}

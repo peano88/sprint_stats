@@ -1,0 +1,38 @@
+{
+    "sprint_nr": 12,
+    "nr_team_members": 3,
+    "working_days": 28,
+    "committed_stories": 5,
+    "committed_points": 47,
+    "added_stories": 3,
+    "added_points": 21,
+    "validated_stories": 7,
+    "validated_points": 60,
+
+    "load": {
+        "points_person": 20,
+        "points_person_day": 2.14
+    },
+
+    "counters": {
+        "working_days": 331,
+        "committed_stories": 67,
+        "committed_points": 509,
+        "added_stories": 30,
+        "added_points": 142,
+        "validated_stories": 63,
+        "validated_points": 408
+    },
+
+    "averages": {
+        "working_days": 27,
+        "committed_stories": 5.58,
+        "committed_points": 42.41,
+        "added_stories": 2.5,
+        "added_points": 11.83,
+        "validated_stories": 5.25,
+        "validated_points": 34,
+        "points_person": 11.33,
+        "points_person_day": 1.23
+    }
+}
