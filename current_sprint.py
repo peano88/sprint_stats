@@ -7,10 +7,12 @@ def check_sprint(sprint, keys):
         try:
             key_path = key.split('.')
             functools.reduce(lambda obj, path: obj[path], key_path, sprint)
+            return True
         except KeyError:
             print("Key {} not found in object".format(key))
+            return False
 
-    [multi_level_check(sprint, k) for k in keys]
+    return all([multi_level_check(sprint, k) for k in keys])
 
 def counters(previous_counters, current_sprint):
     return {k: v + current_sprint[k] for k,v in previous_counters.items()}
@@ -30,6 +32,14 @@ def load_on_current_sprint(current_sprint):
     load["points_person_day"] = current_sprint["validated_points"]/current_sprint["working_days"]
     return load
 
+def calculate_current_sprint_stats(previous_sprint, current_sprint):
+    sprint_nr = current_sprint["sprint_nr"]
+    current_sprint["load"] = load_on_current_sprint(current_sprint)
+    current_sprint["counters"] = counters(previous_sprint["counters"], current_sprint)
+    current_sprint["averages"] = averages(current_sprint["counters"], sprint_nr)
+    current_sprint["averages"].update(load_averages(previous_sprint, current_sprint["load"], sprint_nr))
+    return current_sprint
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-p", "--previous_sprint_file", required=True)
@@ -42,14 +52,12 @@ def main():
         previous_sprint = json.load(json_data_previous)
         current_sprint = json.load(json_data_current)
     
-    check_sprint(current_sprint,["sprint_nr","validated_points", "nr_team_members", "working_days"])
-    check_sprint(previous_sprint, ["counters","averages"])
+    if not check_sprint(current_sprint,["sprint_nr","validated_points", "nr_team_members", "working_days"]):
+        return
+    if not check_sprint(previous_sprint, ["counters","averages"]):
+        return
 
-    sprint_nr = current_sprint["sprint_nr"]
-    current_sprint["load"] = load_on_current_sprint(current_sprint)
-    current_sprint["counters"] = counters(previous_sprint["counters"], current_sprint)
-    current_sprint["averages"] = averages(current_sprint["counters"], sprint_nr)
-    current_sprint["averages"].update(load_averages(previous_sprint, current_sprint["load"], sprint_nr))
+    current_sprint = calculate_current_sprint_stats(previous_sprint, current_sprint)
 
     if args.dry_run:
         print(json.dumps(current_sprint, indent=4 * ' '))

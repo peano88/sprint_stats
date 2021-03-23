@@ -1,3 +1,5 @@
 data
 .vscode
 *.png
+.pytest_cache
+*.egg-info
