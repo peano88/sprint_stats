@@ -19,12 +19,10 @@ def averages(counters, sprint_nr):
     return {k: v/sprint_nr for k, v in counters.items()}
 
 def load_averages(previous_sprint, current_load, sprint_nr):
-    #Not the cleanest way but it avoids retrieving all history
-    previous_value_points_person_cum = previous_sprint["averages"]["points_person"] * previous_sprint["sprint_nr"]
-    new_value_points_person = (current_load["points_person"] + previous_value_points_person_cum)/sprint_nr
-    previous_value_points_person_day_cum = previous_sprint["averages"]["points_person_day"] * previous_sprint["sprint_nr"]
-    new_value_points_person_day = (current_load["points_person_day"] + previous_value_points_person_day_cum)/sprint_nr
-    return (new_value_points_person, new_value_points_person_day)
+    #Not the cleanest way but it avoids retrieving all history:
+    #Calculate previous value as previous average * previous sprint nr
+    # and then add the current value to finally calculate the new average 
+    return {k: (previous_sprint["averages"][k] * (sprint_nr - 1) + v)/sprint_nr for k,v in current_load.items()}
 
 def load_on_current_sprint(current_sprint):
     load = {}
@@ -45,15 +43,13 @@ def main():
         current_sprint = json.load(json_data_current)
     
     check_sprint(current_sprint,["sprint_nr","validated_points", "nr_team_members", "working_days"])
-    check_sprint(previous_sprint, ["counters","averages.points_person", "sprint_nr", "averages.points_person_day"])
+    check_sprint(previous_sprint, ["counters","averages"])
 
     sprint_nr = current_sprint["sprint_nr"]
     current_sprint["load"] = load_on_current_sprint(current_sprint)
     current_sprint["counters"] = counters(previous_sprint["counters"], current_sprint)
     current_sprint["averages"] = averages(current_sprint["counters"], sprint_nr)
-    new_points_person, new_points_person_day = load_averages(previous_sprint, current_sprint["load"], sprint_nr)
-    current_sprint["averages"]["points_person"] = new_points_person
-    current_sprint["averages"]["points_person_day"] = new_points_person_day
+    current_sprint["averages"].update(load_averages(previous_sprint, current_sprint["load"], sprint_nr))
 
     if args.dry_run:
         print(json.dumps(current_sprint, indent=4 * ' '))
