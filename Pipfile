@@ -9,6 +9,7 @@ argparse = "*"
 aiofiles = "*"
 matplotlib = "*"
 pytest = "*"
+pytest-asyncio = "*"
 
 [dev-packages]
 

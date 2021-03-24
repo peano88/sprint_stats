@@ -1,6 +1,9 @@
 import simplejson as json
 import argparse
 import functools
+import aiofiles
+import sprint_template
+import asyncio
 
 def check_sprint(sprint, keys):
     def multi_level_check(sprint, key):
@@ -32,6 +35,19 @@ def load_on_current_sprint(current_sprint):
     load["points_person_day"] = current_sprint["validated_points"]/current_sprint["working_days"]
     return load
 
+async def load_jsons(previous_sprint_file, current_sprint_file, template_file):
+    async def load_json(file):
+        async with aiofiles.open(file, 'r') as f:
+            contents = await f.read()
+        return json.loads(contents)
+    
+    previous_sprint = await load_json(previous_sprint_file)
+    current_sprint = await load_json(current_sprint_file)
+    template = await sprint_template.parse_template(template_file)
+
+    return previous_sprint, current_sprint, template
+
+
 def calculate_current_sprint_stats(previous_sprint, current_sprint):
     sprint_nr = current_sprint["sprint_nr"]
     current_sprint["load"] = load_on_current_sprint(current_sprint)
@@ -44,13 +60,12 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-p", "--previous_sprint_file", required=True)
     parser.add_argument("-c", "--current_sprint_file", required=True)
+    parser.add_argument("-t", "--template-file", required=True)
     parser.add_argument("-d", "--dry-run", dest="dry_run", action="store_true")
     parser.set_defaults(dry_run=False)
     args = parser.parse_args()
 
-    with open(args.previous_sprint_file) as json_data_previous, open(args.current_sprint_file) as json_data_current:
-        previous_sprint = json.load(json_data_previous)
-        current_sprint = json.load(json_data_current)
+    previous_sprint, current_sprint, template = asyncio.run(load_jsons(args.previous_sprint_file, args.current_sprint_file, args.template_file))
     
     if not check_sprint(current_sprint,["sprint_nr","validated_points", "nr_team_members", "working_days"]):
         return
