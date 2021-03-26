@@ -7,29 +7,5 @@
     "sprint_nr": 13,
     "validated_points": 42,
     "validated_stories": 6,
-    "working_days": 27,
-    "load": {
-        "points_person": 14.0,
-        "points_person_day": 1.5555555555555556
-    },
-    "counters": {
-        "working_days": 358,
-        "committed_stories": 72,
-        "committed_points": 546,
-        "added_stories": 31,
-        "added_points": 147,
-        "validated_stories": 69,
-        "validated_points": 450
-    },
-    "averages": {
-        "working_days": 27.53846153846154,
-        "committed_stories": 5.538461538461538,
-        "committed_points": 42.0,
-        "added_stories": 2.3846153846153846,
-        "added_points": 11.307692307692308,
-        "validated_stories": 5.3076923076923075,
-        "validated_points": 34.61538461538461,
-        "points_person": 11.535384615384617,
-        "points_person_day": 1.2550427350427351
-    }
+    "working_days": 27
 }

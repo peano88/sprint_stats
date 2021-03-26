@@ -17,23 +17,22 @@ def check_sprint(sprint, keys):
 
     return all([multi_level_check(sprint, k) for k in keys])
 
-def counters(previous_counters, current_sprint):
-    return {k: v + current_sprint[k] for k,v in previous_counters.items()}
+def counters(previous_counters, current_sprint, template):
+    return {k: previous_counters.get(k,0) + current_sprint[k] for k in template.counters}
 
-def averages(counters, sprint_nr):
-    return {k: v/sprint_nr for k, v in counters.items()}
+def averages(current_sprint, template):
+    sprint_nr = current_sprint[template.sprint_nr_key]
+    return {k: current_sprint[template.counters_key][k]/sprint_nr for k in template.averages}
 
-def load_averages(previous_sprint, current_load, sprint_nr):
+def other_averages(previous_sprint, current_sprint, template):
     #Not the cleanest way but it avoids retrieving all history:
     #Calculate previous value as previous average * previous sprint nr
     # and then add the current value to finally calculate the new average 
-    return {k: (previous_sprint["averages"][k] * (sprint_nr - 1) + v)/sprint_nr for k,v in current_load.items()}
+    sprint_nr = current_sprint[template.sprint_nr_key]
+    return {k: (previous_sprint[template.averages_key][k] * (sprint_nr - 1) + current_sprint[k])/sprint_nr for k in template.other_averages}
 
-def load_on_current_sprint(current_sprint):
-    load = {}
-    load["points_person"] = current_sprint["validated_points"]/current_sprint["nr_team_members"]
-    load["points_person_day"] = current_sprint["validated_points"]/current_sprint["working_days"]
-    return load
+def custom(current_sprint, template):
+    return {k: expression.evaluate(current_sprint) for k, expression in template.custom}
 
 async def load_jsons(previous_sprint_file, current_sprint_file, template_file):
     async def load_json(file):
@@ -48,12 +47,11 @@ async def load_jsons(previous_sprint_file, current_sprint_file, template_file):
     return previous_sprint, current_sprint, template
 
 
-def calculate_current_sprint_stats(previous_sprint, current_sprint):
-    sprint_nr = current_sprint["sprint_nr"]
-    current_sprint["load"] = load_on_current_sprint(current_sprint)
-    current_sprint["counters"] = counters(previous_sprint["counters"], current_sprint)
-    current_sprint["averages"] = averages(current_sprint["counters"], sprint_nr)
-    current_sprint["averages"].update(load_averages(previous_sprint, current_sprint["load"], sprint_nr))
+def calculate_current_sprint_stats(previous_sprint, current_sprint, template):
+    current_sprint.update(custom(current_sprint, template))
+    current_sprint[template.counters_key] = counters(previous_sprint.get(template.counters_key,{}), current_sprint, template)
+    current_sprint[template.averages_key] = averages(current_sprint, template)
+    current_sprint[template.averages_key].update(other_averages(previous_sprint, current_sprint, template))
     return current_sprint
 
 def main():
@@ -67,12 +65,12 @@ def main():
 
     previous_sprint, current_sprint, template = asyncio.run(load_jsons(args.previous_sprint_file, args.current_sprint_file, args.template_file))
     
-    if not check_sprint(current_sprint,["sprint_nr","validated_points", "nr_team_members", "working_days"]):
+    if not check_sprint(current_sprint,template.keys_to_check_current()):
         return
-    if not check_sprint(previous_sprint, ["counters","averages"]):
+    if not check_sprint(previous_sprint,template.keys_to_check_previous()):
         return
 
-    current_sprint = calculate_current_sprint_stats(previous_sprint, current_sprint)
+    current_sprint = calculate_current_sprint_stats(previous_sprint, current_sprint, template)
 
     if args.dry_run:
         print(json.dumps(current_sprint, indent=4 * ' '))

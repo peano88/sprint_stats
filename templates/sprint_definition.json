@@ -1,25 +1,25 @@
 {
     "keys": {
-        "sprint_nr": "sprint_nr",
-        "custom": [
-            {
-                "key": "points_person",
-                "expression": {
-                    "operation": "div",
-                    "expression_1": "validated_points",
-                    "expression_2": "nr_team_members"
-                }
-            },
-            {
-                "key": "points_person_day",
-                "expression": {
-                    "operation": "div",
-                    "expression_1": "validated_points",
-                    "expression_2": "working_days"
-                }
-            }
-        ]
+        "sprint_nr": "sprint_nr"
     },
+    "custom": [
+        {
+            "key": "points_person",
+            "expression": {
+                "operation": "/",
+                "expression_1": "validated_points",
+                "expression_2": "nr_team_members"
+            }
+        },
+        {
+            "key": "points_person_day",
+            "expression": {
+                "operation": "/",
+                "expression_1": "validated_points",
+                "expression_2": "working_days"
+            }
+        }
+    ],
     "averages": [
         "working_days",
         "committed_stories",
