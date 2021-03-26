@@ -43,7 +43,7 @@
                     "y_label": "points",
                     "plots": [
                         {
-                            "item": "load.points_person",
+                            "item": "points_person",
                             "label": "points per person"
                         }
                     ]
@@ -53,7 +53,7 @@
                     "y_label": "points",
                     "plots": [
                         {
-                            "item": "load.points_person_day",
+                            "item": "points_person_day",
                             "label": "points per person/day"
                         }
                     ]

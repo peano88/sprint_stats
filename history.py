@@ -30,6 +30,7 @@ async def analyze_file(file, items):
 
 def create_point_list(sprint_points, item):
     item_points = [p[item] for p in sprint_points]
+    item_points.sort(key=lambda elem: elem[0]) # sort based on sprint nr
     sprints, values = zip(*item_points)
     return (sprints, values)
 
